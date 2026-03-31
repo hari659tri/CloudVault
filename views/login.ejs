@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — CloudVault</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0f14; --panel: #13161e; --panel-border: #1e2330;
+      --accent: #6c63ff; --accent-glow: rgba(108,99,255,0.35);
+      --accent-soft: rgba(108,99,255,0.12); --text-primary: #eef0f6;
+      --text-secondary: #7b82a0; --input-bg: #0d0f14;
+      --input-border: #1e2330; --input-focus: #6c63ff;
+      --success: #34d399; --error: #f87171;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif; background: var(--bg);
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 24px; overflow: hidden; position: relative;
+    }
+    body::before {
+      content: ''; position: fixed; top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(108,99,255,0.15) 0%, transparent 70%);
+      border-radius: 50%; animation: blobFloat 8s ease-in-out infinite alternate; pointer-events: none;
+    }
+    body::after {
+      content: ''; position: fixed; bottom: -200px; right: -200px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(52,211,153,0.1) 0%, transparent 70%);
+      border-radius: 50%; animation: blobFloat 10s ease-in-out infinite alternate-reverse; pointer-events: none;
+    }
+    @keyframes blobFloat { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,40px) scale(1.1); } }
+    .card {
+      background: var(--panel); border: 1px solid var(--panel-border);
+      border-radius: 20px; padding: 28px 32px; width: 100%; max-width: 420px;
+      position: relative; z-index: 1;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+      animation: cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes cardIn { from { opacity:0; transform: translateY(30px) scale(0.97); } to { opacity:1; transform: translateY(0) scale(1); } }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--accent-soft); border: 1px solid rgba(108,99,255,0.25);
+      color: #a89fff; font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 5px 12px; border-radius: 100px; margin-bottom: 12px;
+    }
+    .badge::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 6px var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    h1 { font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.2; margin-bottom: 4px; }
+    h1 span { color: var(--accent); }
+    .subtitle { color: var(--text-secondary); font-size: 14px; font-weight: 300; margin-bottom: 18px; }
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    label { font-size: 12px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.04em; text-transform: uppercase; }
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-icon { position: absolute; left: 14px; color: var(--text-secondary); width: 16px; height: 16px; transition: color 0.2s; pointer-events: none; }
+    input { width: 100%; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 9px 14px 9px 40px; outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; }
+    input::placeholder { color: #3a3f55; }
+    input:focus { border-color: var(--input-focus); box-shadow: 0 0 0 3px var(--accent-glow); background: #10131b; }
+    .input-wrap:focus-within .input-icon { color: var(--accent); }
+    .toggle-pw { position: absolute; right: 14px; background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 0; display: flex; align-items: center; transition: color 0.2s; }
+    .toggle-pw:hover { color: var(--text-primary); }
+    .forgot-row { display: flex; justify-content: flex-end; margin-top: -6px; margin-bottom: 14px; }
+    .forgot-row a { font-size: 12px; color: var(--accent); text-decoration: none; font-weight: 500; }
+    /* ✅ Error message from server */
+    .error-msg {
+      background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);
+      color: var(--error); font-size: 12.5px; padding: 9px 12px; border-radius: 10px;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .submit-btn {
+      width: 100%; background: var(--accent); border: none; border-radius: 12px;
+      color: #fff; font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600;
+      padding: 11px; cursor: pointer; position: relative; overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 8px 24px rgba(108,99,255,0.4);
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(108,99,255,0.5); }
+    .submit-btn:active { transform: translateY(1px); }
+    .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer-note { text-align: center; color: var(--text-secondary); font-size: 13px; margin-top: 14px; }
+    .footer-note a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="badge">Welcome Back</div>
+  <h1>Sign in to your <span>account</span></h1>
+  <p class="subtitle">Good to see you again — let's pick up where you left off.</p>
+
+  <!-- ✅ Show server error if login failed -->
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-msg">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <%= error %>
+    </div>
+  <% } %>
+
+  <!-- ✅ form posts to /user/login -->
+  <form action="/user/login" method="POST" id="loginForm">
+    <div class="field">
+      <label for="email">Email Address</label>
+      <div class="input-wrap">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>
+        <input type="email" id="email" name="email" placeholder="john@example.com" autocomplete="email" required />
+      </div>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <div class="input-wrap">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required />
+        <button type="button" class="toggle-pw" id="togglePw">
+          <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="forgot-row"><a href="#">Forgot password?</a></div>
+    <button type="submit" class="submit-btn" id="submitBtn">Sign In →</button>
+  </form>
+
+  <p class="footer-note">Don't have an account? <a href="/user/register">Create one</a></p>
+</div>
+
+<script>
+  const pwInput = document.getElementById('password');
+  const eyeIcon = document.getElementById('eyeIcon');
+  document.getElementById('togglePw').addEventListener('click', () => {
+    const isHidden = pwInput.type === 'password';
+    pwInput.type = isHidden ? 'text' : 'password';
+    eyeIcon.innerHTML = isHidden
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`
+      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    btn.innerHTML = '<span class="spinner"></span> Signing in...';
+    btn.disabled = true;
+  });
+</script>
+</body>
+</html>
