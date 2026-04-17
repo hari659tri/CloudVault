@@ -1,5 +1,3 @@
-<img width="1365" height="598" alt="image" src="https://github.com/user-attachments/assets/2b623701-fe35-40f8-a6a2-80dd733c8e9a" />
-
 <h1 align="center">☁️ CloudVault</h1>
 
 <p align="center">
@@ -122,6 +120,11 @@ CloudVault/
   <li>Delete files anytime</li>
 </ul>
 
+<hr/>
+
+<pre>
+<img width="1365" height="598" alt="image" src="https://github.com/user-attachments/assets/2b623701-fe35-40f8-a6a2-80dd733c8e9a" />
+</pre>
 <hr/>
 
 <h2>💡 Future Improvements</h2>
